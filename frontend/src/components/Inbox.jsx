@@ -3,6 +3,25 @@ import {
   Inbox as InboxIcon, Loader2, AlertCircle, Unlock, ShieldCheck,
   ShieldAlert, ShieldQuestion, ChevronDown, ChevronUp, RefreshCw
 } from 'lucide-react';
+import CopyButton from './CopyButton';
+
+function LabeledBlock({ label, value, color, tall }) {
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1">
+        <p className="text-[11px] text-slate-500 uppercase tracking-wide">{label}</p>
+        <CopyButton text={value} />
+      </div>
+      <p
+        className={`text-xs font-mono ${color} break-all bg-slate-900 p-2 rounded-lg border border-slate-800 ${
+          tall ? 'max-h-24 overflow-y-auto' : ''
+        }`}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
 
 function timeAgo(iso) {
   const diff = Math.max(0, Date.now() - new Date(iso).getTime());
@@ -58,6 +77,24 @@ function MessageCard({ msg, keys, onDecrypt, decrypted }) {
         </div>
       )}
 
+      {/* Shown immediately, even before decrypting -- this is exactly what
+          travelled over the network: unreadable ciphertext, plus the
+          sender's public key (safe to see; it's public by definition and
+          is what lets you verify their signature after decrypting). */}
+      <div className="mt-3 space-y-2">
+        <LabeledBlock
+          label="Encrypted message (AES-256-GCM ciphertext, as received)"
+          value={msg.encryptedMessage}
+          color="text-sky-400"
+        />
+        <LabeledBlock
+          label={`Sender's public key (${msg.from})`}
+          value={msg.senderPublicKey || '(not provided with this message)'}
+          color="text-emerald-400"
+          tall
+        />
+      </div>
+
       {decrypted && (
         <div className="mt-3 animate-fade-in">
           <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3">
@@ -89,24 +126,18 @@ function MessageCard({ msg, keys, onDecrypt, decrypted }) {
         className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-300 mt-3 transition-colors"
       >
         {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-        {expanded ? 'Hide raw bundle' : 'View raw bundle (what was actually transmitted)'}
+        {expanded ? 'Hide remaining bundle fields' : 'View remaining bundle fields (session key, IV, tag, signature)'}
       </button>
 
       {expanded && (
         <div className="mt-2 space-y-2 animate-fade-in">
           {[
             ['Encrypted session key (RSA-OAEP)', msg.encryptedSessionKey, 'text-amber-400'],
-            ['Encrypted message (AES-256-GCM)', msg.encryptedMessage, 'text-sky-400'],
             ['IV', msg.iv, 'text-violet-400'],
             ['Auth tag', msg.authTag, 'text-fuchsia-400'],
-            ['Signature', msg.signature || '(none)', 'text-teal-400'],
+            ['Signature (RSA, signed with sender\'s private key)', msg.signature || '(none)', 'text-teal-400'],
           ].map(([label, value, color]) => (
-            <div key={label}>
-              <p className="text-[11px] text-slate-500 uppercase tracking-wide mb-0.5">{label}</p>
-              <p className={`text-xs font-mono ${color} break-all bg-slate-900 p-2 rounded-lg border border-slate-800`}>
-                {value}
-              </p>
-            </div>
+            <LabeledBlock key={label} label={label} value={value} color={color} />
           ))}
         </div>
       )}
