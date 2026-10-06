@@ -1,0 +1,16 @@
+{
+  "name": "pgp-smime-backend",
+  "version": "2.0.0",
+  "description": "Multi-user hybrid PGP/S-MIME encryption backend (AES-256-GCM + RSA-OAEP + RSA signatures)",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}

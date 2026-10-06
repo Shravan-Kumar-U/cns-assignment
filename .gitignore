@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Env files (contain local/deployment-specific URLs, not secrets here,
+# but still good practice to keep out of version control)
+.env
+.env.local
+.env.*.local
+
+# Runtime data (the user registry and inboxes -- regenerated at runtime,
+# should not be committed)
+backend/data/users.json
+backend/data/messages.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store

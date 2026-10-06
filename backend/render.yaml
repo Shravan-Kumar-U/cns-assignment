@@ -1,0 +1,16 @@
+# Optional: lets Render auto-configure this service from this file
+# ("New + -> Blueprint" on Render, pointing at this repo). You can also
+# skip this entirely and set the same values by hand in the dashboard --
+# see DEPLOY.md for the manual steps, which is the recommended path the
+# first time so you see each setting.
+services:
+  - type: web
+    name: pgp-smime-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    plan: free
+    envVars:
+      - key: FRONTEND_URL
+        sync: false
